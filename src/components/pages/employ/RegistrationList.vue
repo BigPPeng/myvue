@@ -15,8 +15,11 @@
           style="width: 100%"
           typle="margin-top: 90px;"
         >
-          <el-table-column label="招工信息" prop="text" />
-          <el-table-column label="申请时间" prop="time" />
+          <el-table-column label="id" prop="id" />
+          <el-table-column label="招聘信息ID" prop="recruitmentInfoId" />
+          <el-table-column label="申请人ID" prop="applicantId" v-if="false"/>
+          <el-table-column label="申请人" prop="applicantName" v-if="false"/>
+          <el-table-column label="申请时间" prop="applicationTime" />
           <el-table-column label="操作">
             <template slot-scope="scope">
           
@@ -25,7 +28,7 @@
                 type="danger"
                 icon="el-icon-delete"
                 size="mini"
-                @click="handleDelete(scope.row)"
+                @click="deleteApply(scope.row)"
                 >删除</el-button
               >
             </template>
@@ -40,16 +43,42 @@
   
   <script>
   export default {
+    created() {
+    this.getList();
+  },
     data() {
       return {
-        tableData: [
-          {
-            text: "招工落花生：80元/天，2024-03-15到2024-04-15，招10人。",
-            time: "2024-03-18",
-          }
-        ],
+        tableData: [],
       };
     },
+
+    methods: {
+      async getList() {
+      let user = window.sessionStorage.getItem('user');
+      let userObj = JSON.parse(user);
+      const { data: aa } = await this.$http.post("/api/recruitment/selectRecruitmentApplicationRecordByApplyUserId", {id:userObj.id});
+      console.log(aa)
+      this.tableData = aa.data;
+    },
+    //删除
+    async deleteApply(row) {
+      console.log(row)
+      const id = row.id;
+      const confirmResult = await this.$confirm('是否确认删除序号为"' + id + '"的报名信息?', "提示", {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
+      // 成功删除为confirm 取消为 cancel
+      if (confirmResult != 'confirm') {
+        this.$refs.multipleTable.clearSelection();
+        return this.$message.info("已取消删除");
+      }
+      const { data: bb } = await this.$http.post("/api/recruitment/delRecruitmentApplicationRecord", { id: row.id });
+      this.$message.success(bb);
+      this.getList();
+    },
+  }
   };
   </script>
   

@@ -18,9 +18,6 @@
             </template>
           </div>
         </el-card>
-
-
-
       </el-col>
     </el-row>
 

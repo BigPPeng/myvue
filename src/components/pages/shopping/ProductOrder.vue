@@ -22,11 +22,13 @@
       </el-row>
 
       <el-table :data="tableData" border style="width: 100%" typle="margin-top: 90px;">
-        <el-table-column label="商品名称" prop="name" />  
-        <el-table-column label="购买时间" prop="date" />
-        <el-table-column label="单价" prop="price" />
-        <el-table-column label="数量" prop="num" />
-        <el-table-column label="发货地址" prop="address" />
+        <el-table-column label="id" prop="id" />  
+        <el-table-column label="商品ID" prop="productId" v-if="false"/>
+        <el-table-column label="数量" prop="quantity" />
+        <el-table-column label="价格" prop="price" />
+        <el-table-column label="卖家ID" prop="sellerUserId" v-if="false"/>
+        <el-table-column label="买家ID" prop="buyerUserId" v-if="false"/>
+        <el-table-column label="购买时间" prop="purchaseTime" />
         <el-table-column label="操作">
           <template slot-scope="scope">
             <!-- 修改 -->
@@ -41,7 +43,7 @@
               type="danger"
               icon="el-icon-delete"
               size="mini"
-              @click="handleDelete(scope.row)"
+              @click="deleteOrder(scope.row)"
             >删除</el-button>
           </template>
         </el-table-column>
@@ -55,40 +57,49 @@
 
 <script>
 export default {
+  created() {
+    this.getList();
+  },
   data() {
     return {
-      tableData: [
-        {
-          name: "除草剂",
-          date: "2024-03-15",
-          price: "1",
-          num: "5",
-          address: "小王村",
-        },
-        {
-            name: "玉米种子",
-          date: "2024-03-16",
-          price: "10",
-          num: "3",
-          address: "小王村",
-        },
-        {
-            name: "玉米种子",
-          date: "2024-03-16",
-          price: "10",
-          num: "3",
-          address: "小王村",
-        },
-        {
-            name: "玉米种子",
-          date: "2024-03-16",
-          price: "10",
-          num: "3",
-          address: "小王村",
-        },
-      ],
+      tableData: [],
     };
   },
+
+  methods: {
+    //搜索获取列表信息
+    async getList() {
+      let user = window.sessionStorage.getItem('user');
+      let userObj = JSON.parse(user);
+      const { data: aa } = await this.$http.post("/api/product/getBuyOrderByUserId", {id:userObj.id});
+      console.log(aa)
+      this.tableData = aa.data;
+    },
+    //删除
+    async deleteOrder(row) {
+      console.log(row)
+      const id = row.id;
+      const confirmResult = await this.$confirm('是否确认删除序号为"' + id + '"的订单?', "提示", {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
+      // 成功删除为confirm 取消为 cancel
+      if (confirmResult != 'confirm') {
+        this.$refs.multipleTable.clearSelection();
+        return this.$message.info("已取消删除");
+      }
+      const { data: bb } = await this.$http.post("/api/product/deleteSaleProduct", { id: row.id });  //改deleteSaleProduct，现在的接口是所有商品的列表删除接口，现在需要供应商订单删除接口
+      this.$message.success(bb);
+      this.getList();
+    },
+    //取消
+    reset() {
+      this.queryForm.userType = null,
+      this.getList();
+    }
+  }
+
 };
 </script>
 

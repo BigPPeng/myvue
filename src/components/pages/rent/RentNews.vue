@@ -10,7 +10,7 @@
         <el-row :gutter="25">
   
       <el-col :span="5">
-        <el-button type="primary" @click="dialogVisible = true"
+        <el-button type="primary" @click="gotoPublish()"
             >发布租用信息</el-button>
       </el-col>
     
@@ -46,7 +46,7 @@
         width="50%"
         @close="dialogVisible = false"
       >
-        <el-form :model="registerForm" ref="registerForm" label-width="120px">
+        <el-form :model="publishRent" ref="registerForm" label-width="120px">
           <el-form-item label="标题">
             <el-input placeholder="请输入标题" v-model="registerForm.username"></el-input>
           </el-form-item>
@@ -78,30 +78,9 @@
   export default {
     data() {
       return {
-        tableData: [
-          {
-            name: "【拖拉机出租】出租它",
-            date: "2024-2-8",
-            text: "闲置出租：100元/天，2024-03-15到2024-04-15，数量10台。",
-          },
-          {
-            name: "【割麦机出租】出租它",
-            date: "2024-2-8",
-            text: "闲置出租：100元/天，2024-03-15到2024-04-15，数量10台。",
-          },
-          {
-            name: "【拖拉机出租】出租它",
-            date: "2024-2-8",
-            text: "闲置出租：100元/天，2024-03-15到2024-04-15，数量10台。",
-          },
-          {
-            name: "【割麦机出租】出租它",
-            date: "2024-2-8",
-            text: "闲置出租：100元/天，2024-03-15到2024-04-15，数量10台。",
-          },
-        ],
+        tableData: [],
         dialogVisible: false,
-      registerForm: {
+        registerForm: {
         username: "",
         password: "",
         identity: "", // 初始值可以是'farmer'、'supplier'或'buyer'中的任何一个，或者为空字符串
@@ -122,6 +101,26 @@
       });
     },
   },
+
+    //删除
+    async deleteUser(row) {
+      console.log(row)
+      const userName = row.username;
+      const confirmResult = await this.$confirm('是否确认删除名称为"' + userName + '"的用户?', "提示", {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
+      // 成功删除为confirm 取消为 cancel
+      if (confirmResult != 'confirm') {
+        this.$refs.multipleTable.clearSelection();
+        return this.$message.info("已取消删除");
+      }
+      const { data: bb } = await this.$http.post("/api/user/deleteUser", { id: row.id });
+      this.$message.success(bb);
+      this.getList();
+    }, 
+    
   };
   </script>
   

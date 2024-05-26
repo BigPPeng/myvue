@@ -6,27 +6,13 @@
         <span>现代农业服务平台</span>
       </div>
       <!--表单-->
-      <el-form
-        ref="loginFormRef"
-        :model="loginForm"
-        :rules="loginRules"
-        class="login_form"
-        label-width="0"
-      >
+      <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" class="login_form" label-width="0">
         <el-form-item prop="username">
-          <el-input
-            v-model="loginForm.userName"
-            prefix-icon="el-icon-user"
-            placeholder="请输入用户名"
-          ></el-input>
+          <el-input v-model="loginForm.userName" prefix-icon="el-icon-user" placeholder="请输入用户名"></el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input
-            v-model="loginForm.userPass"
-            prefix-icon="el-icon-lock"
-            type="password"
-            placeholder="请输入密码"
-          ></el-input>
+          <el-input v-model="loginForm.userPass" prefix-icon="el-icon-lock" type="password"
+            placeholder="请输入密码"></el-input>
         </el-form-item>
         <!-- 新用户注册按钮 -->
         <!-- <el-button type="primary" @click="showRegisterDialog = true">新用户注册</el-button>
@@ -41,36 +27,29 @@
       </el-form>
     </div>
     <!-- 对话框 -->
-    <el-dialog
-      title="注册"
-      :visible.sync="dialogVisible"
-      width="50%"
-      @close="dialogVisible = false"
-    >
+    <el-dialog title="注册" :visible.sync="dialogVisible" width="50%" @close="dialogVisible = false">
       <el-form :model="registerForm" ref="registerForm" label-width="120px">
         <el-form-item label="用户名">
-          <el-input v-model="registerForm.username"></el-input>
+          <el-input v-model="registerForm.userName"></el-input>
         </el-form-item>
         <el-form-item label="密码">
-          <el-input type="password" v-model="registerForm.password"></el-input>
+          <el-input type="password" v-model="registerForm.userPass"></el-input>
         </el-form-item>
         <el-form-item label="身份">
-          <el-radio-group v-model="registerForm.identity">
-            <el-radio label="farmer">农户</el-radio>
-            <el-radio label="supplier">供货商</el-radio>
-            <el-radio label="buyer">收购商</el-radio>
+          <el-radio-group v-model="registerForm.userType">
+            <el-radio label="1">农户</el-radio>
+            <el-radio label="4">供货商</el-radio>
+            <el-radio label="5">收购商</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="手机号码">
-          <el-input v-model="registerForm.phone"></el-input>
+          <el-input v-model="registerForm.userPhone"></el-input>
         </el-form-item>
         <el-form-item label="地址">
-          <el-input v-model="registerForm.address"></el-input>
+          <el-input v-model="registerForm.userEmail"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitForm('registerForm')"
-            >提交</el-button
-          >
+          <el-button type="primary" @click="submitForm()">提交</el-button>
           <el-button @click="dialogVisible = false">取消</el-button>
         </el-form-item>
       </el-form>
@@ -99,11 +78,11 @@ export default {
       // showRegisterView: false // 控制注册弹窗的显示与隐藏
       dialogVisible: false,
       registerForm: {
-        username: "",
-        password: "",
-        identity: "", // 初始值可以是'farmer'、'supplier'或'buyer'中的任何一个，或者为空字符串
-        phone: "",
-        address: "",
+        userName: "",
+        userPass: "",
+        userType: "", // 初始值可以是'farmer'、'supplier'或'buyer'中的任何一个，或者为空字符串
+        userPhone: "",
+        userEmail: "",
       },
     };
   },
@@ -127,30 +106,36 @@ export default {
         if (ref.status == 0) {
           this.$message.success("登录成功");
           window.sessionStorage.setItem("flag", "ok"); // session 放置
-          //跳转到系统主页,通过路由实现
-          this.$router.push({ path: "IndexView" });
           //将user存储到session域空间中
-          window.sessionStorage.setItem("user", ref.user);
+          // console.log(ref);
+          // console.log(ref.data);
+          // console.log(ref.data.id);
+          let userObject = JSON.stringify(ref.data);
+          window.sessionStorage.setItem("user", [userObject]);
+          //跳转到系统主页,通过路由实现
+          this.$router.push({ path: '/IndexView1' });
         } else {
           this.$message.error("登录失败");
         }
       });
     },
 
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          alert("提交成功"); // 这里应该是一个异步请求来提交表单数据到服务器
-        } else {
-          console.log("error submit!!");
-          return false;
-        }
-      });
+    async submitForm() {
+      console.log(this.registerForm);
+      const { data: bb } = await this.$http.post("/api/user/userRegister", this.registerForm);
+      console.log(bb);
+      if(bb.status != 0) {
+        this.$message.error("请重试，注册失败:"+bb.message);
+      } else {
+        this.$message.success("注册完成，请登录");
+        this.dialogVisible = false;
+      }
     },
 
     handleRegisterSuccess() {
+        
       // 处理注册成功的逻辑，比如跳转到登录页面或首页
-      this.$router.push("IndexView"); // 假设注册成功后跳转到登录页面
+      //this.$router.push("/"); // 假设注册成功后跳转到登录页面
     },
   },
 };
@@ -167,6 +152,7 @@ export default {
   width: 100%;
   min-height: 100vh;
 }
+
 //登录盒子样式
 .login_box {
   width: 450px;
@@ -179,11 +165,13 @@ export default {
   transform: translate(-50%, -50%);
   text-align: center;
   opacity: 0.9;
+
   .movie-title {
     font-size: 50px;
     margin-top: -60px;
     margin-left: 0px;
   }
+
   /*.avatar_box{*/
   /*   width: 130px;*/
   /*   height: 130px;*/
@@ -205,12 +193,14 @@ export default {
   /*   }*/
   /* }*/
 }
+
 //表单样式
 .bts {
   display: flex;
   //弹性盒子元素将向行结束位置对齐
   justify-content: flex-end;
 }
+
 .login_form {
   position: absolute;
   bottom: 0;
