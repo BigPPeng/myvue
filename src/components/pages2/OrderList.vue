@@ -6,20 +6,6 @@
       <el-breadcrumb-item>订单列表</el-breadcrumb-item>
     </el-breadcrumb>
     <el-card>
-      <el-row :gutter="25">
-        <el-form ref="queryForm" :model="queryForm" label-width="80px" :inline="true">
-          <el-form-item label="商品名称" prop="productName">
-            <el-input v-model="queryForm.productName"></el-input>
-          </el-form-item>
-
-          <!-- 搜索框 -->
-          <el-form-item>
-            <el-button type="primary" @click="getList()">搜索</el-button>
-            <el-button type="primary" @click="reset()">重置</el-button>
-          </el-form-item>
-        </el-form>
-      </el-row>
-
       <el-table :data="tableData" border style="width: 100%" typle="margin-top: 90px;">
         <el-table-column label="id" prop="id" />
         <el-table-column label="商品ID" prop="productId" v-if="false" />
@@ -30,8 +16,6 @@
         <el-table-column label="购买时间" prop="purchaseTime" />
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <!-- 修改 -->
-            <!-- <el-button type="primary" icon="el-icon-edit" size="mini" @click="edit(scope.row)">修改</el-button> -->
             <!-- 删除 -->
             <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteUser(scope.row)">删除</el-button>
           </template>
@@ -62,7 +46,7 @@ export default {
     async getList() {
       let user = window.sessionStorage.getItem('user');
       let userObj = JSON.parse(user);
-      const { data: aa } = await this.$http.post("/api/product/getBuyOrderByUserId", { id: userObj.id });
+      const { data: aa } = await this.$http.post("/api/product/getBuyOrderByUserId", { id: userObj.id});
       console.log(aa)
       this.tableData = aa.data;
     },

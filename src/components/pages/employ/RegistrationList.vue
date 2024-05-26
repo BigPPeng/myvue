@@ -74,7 +74,7 @@
         this.$refs.multipleTable.clearSelection();
         return this.$message.info("已取消删除");
       }
-      const { data: bb } = await this.$http.post("/api/recruitment/delRecruitmentApplicationRecord", { id: row.id });
+      const { data: bb } = await this.$http.post("/api/recruitment/getRentRecordByUserId", { id: row.id });
       this.$message.success(bb);
       this.getList();
     },

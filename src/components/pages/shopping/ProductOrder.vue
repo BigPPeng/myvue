@@ -7,27 +7,15 @@
       <el-breadcrumb-item>订单列表</el-breadcrumb-item>
     </el-breadcrumb>
     <el-card>
-      <el-row :gutter="25">
-        <el-form ref="queryForm" label-width="80px" :inline="true">
-          <el-form-item label="商品名称" prop="movieName">
-            <el-input></el-input>
-          </el-form-item>
-
-          <!-- 搜索框 -->
-          <el-form-item>
-            <el-button type="primary" @click="getList">搜索</el-button>
-            <el-button type="primary" @click="reset">重置</el-button>
-          </el-form-item>
-        </el-form>
-      </el-row>
+ 
 
       <el-table :data="tableData" border style="width: 100%" typle="margin-top: 90px;">
         <el-table-column label="id" prop="id" />  
-        <el-table-column label="商品ID" prop="productId" v-if="false"/>
+        <el-table-column label="商品ID" prop="productId" />
         <el-table-column label="数量" prop="quantity" />
         <el-table-column label="价格" prop="price" />
-        <el-table-column label="卖家ID" prop="sellerUserId" v-if="false"/>
-        <el-table-column label="买家ID" prop="buyerUserId" v-if="false"/>
+        <el-table-column label="卖家ID" prop="sellerUserId"/>
+        <el-table-column label="买家ID" prop="buyerUserId"/>
         <el-table-column label="购买时间" prop="purchaseTime" />
         <el-table-column label="操作">
           <template slot-scope="scope">

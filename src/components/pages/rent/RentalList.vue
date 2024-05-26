@@ -7,19 +7,7 @@
         <el-breadcrumb-item>出租列表</el-breadcrumb-item>
       </el-breadcrumb>
       <el-card>
-        <el-row :gutter="25">
-          <el-form ref="queryForm" label-width="80px" :inline="true">
-            <el-form-item label="农具名称" prop="movieName">
-              <el-input></el-input>
-            </el-form-item>
-  
-            <!-- 搜索框 -->
-            <el-form-item>
-              <el-button type="primary" @click="getList">搜索</el-button>
-              <el-button type="primary" @click="reset">重置</el-button>
-            </el-form-item>
-          </el-form>
-        </el-row>
+ 
   
         <el-table
           :data="tableData"
@@ -27,12 +15,14 @@
           style="width: 100%"
           typle="margin-top: 90px;"
         >
-          <el-table-column label="农具名称" prop="name"/>
-          <el-table-column label="开始租用时间" prop="startdate" />
-          <el-table-column label="结束租用时间" prop="overdate" />
-          <el-table-column label="租用价格（元）" prop="price" />
-          <el-table-column label="承租人" prop="lessee" />
-          <el-table-column label="操作">
+        <el-table-column label="id" prop="id" />  
+        <el-table-column label="农具ID" prop="productId" />
+        <el-table-column label="数量" prop="quantity" />
+        <el-table-column label="租用价格" prop="price" />
+        <el-table-column label="出租人ID" prop="sellerUserId" v-if="false"/>
+        <el-table-column label="租用人ID" prop="buyerUserId" v-if="false"/>
+        <el-table-column label="租用时间" prop="purchaseTime" />
+        <el-table-column label="操作">
             <template slot-scope="scope">
               <!-- 修改 -->
               <el-button
@@ -62,36 +52,20 @@
   
   <script>
   export default {
+    created() {
+    this.getList();
+  },
     data() {
       return {
-        tableData: [
-          {
-            name: "拖拉机",
-            startdate: "2024-03-15",
-            overdate: "2024-03-16",
-            price: "100",
-            lessee: "小王",
-          },
-          {
-            name: "搅料机",
-            startdate: "2024-03-15",
-            overdate: "2024-03-16",
-            price: "200",
-            lessee: "小马",
-          },
-        ],
+        tableData: [],
       };
     },
     methods: {
     //搜索获取列表信息
-    async getList() {   
-      let types = []; 
-      if (this.queryForm.userType === null) {
-        types = []; 
-      } else {
-        types = [this.queryForm.userType]
-      }
-      const { data: aa } = await this.$http.post("/api/user/getAllUserByType", {list: types});
+    async getList() {
+      let user = window.sessionStorage.getItem('user');
+      let userObj = JSON.parse(user);
+      const { data: aa } = await this.$http.post("/api/product/getAllRentProductByPublishId", {id:userObj.id});
       console.log(aa)
       this.tableData = aa.data;
     },

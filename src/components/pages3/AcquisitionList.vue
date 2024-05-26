@@ -6,20 +6,6 @@
         <el-breadcrumb-item>收购列表</el-breadcrumb-item>
       </el-breadcrumb>
       <el-card>
-        <el-row :gutter="25">
-          <el-form ref="queryForm" :model="queryForm" label-width="80px" :inline="true">
-            <el-form-item label="名称" prop="productName">
-              <el-input v-model="queryForm.productName" ></el-input>
-            </el-form-item>
-  
-            <!-- 搜索框 -->
-            <el-form-item>
-              <el-button type="primary" @click="getList()">搜索</el-button>
-              <el-button type="primary" @click="reset()">重置</el-button>
-            </el-form-item>
-          </el-form>
-        </el-row>
-  
         <el-table :data="tableData" border style="width: 100%" typle="margin-top: 90px;">
           <el-table-column label="ID" prop="id" />
           <el-table-column label="商品名称" prop="productName" />
